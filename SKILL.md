@@ -58,6 +58,7 @@ Generate the following files to enforce AI standards:
    - Create a base workflow that defines a multi-agent structure.
    - The workflow should orchestrate sub-agents representing different roles: *Product Owner*, *Architecte*, *Développeur* (potentially multiple parallel developer agents assigned per feature, layer, or User Story), and *Testeur QA*.
    - Instruct the workflow to pull the execution prompts/instructions for these roles directly from existing skills or the ones downloaded from GitHub.
+   - **Integration & Conflict Resolution**: If multiple developers are working in parallel, they MUST work on separate Git branches. Add an *Integrateur* (or assign the *Architecte*) role responsible for merging these branches, resolving conflicts, and running global integration tests to prevent overlapping code or regressions.
    - **QA Gate Rule**: Explicitly define that the *Développeur* agents cannot mark a task as "done". They must hand off to the *Testeur QA* agent, who must review the code and run tests to validate the User Story acceptance criteria before closing it.
 
 ## Step 4: Codebase Indexing (Memory)
