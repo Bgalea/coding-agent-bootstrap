@@ -10,6 +10,7 @@ The `coding-agent-bootstrap` skill automates the setup of a new software project
 - **Dynamic Rules Sourcing**: Scrapes community repositories (like `awesome-cursorrules` and `cursor.directory`) in real-time to fetch the absolute best AI prompts for your specific stack.
 - **Vertical Slices Architecture**: Organizes your codebase by business domain instead of technical layers, drastically improving LLM context locality.
 - **Universal AI Standards**: Generates `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `task.md`, and an agile `backlog.md`.
+- **Token & Context Optimization**: Enforces the creation of `.cursorignore` / `.agentsignore` and instructs the AI to use minimal context and semantic search to avoid wasting tokens on large files.
 - **Multi-Agent Orchestration**: Automatically templates a `workflow.yml` that delegates tasks to specialized sub-agents.
 - **Local Indexing Ready**: Prepares a `Makefile` to quickly index the workspace into a local Qdrant vector database.
 

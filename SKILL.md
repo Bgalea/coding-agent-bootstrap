@@ -43,6 +43,7 @@ Generate the following files to enforce AI standards:
    - **Coding Standards**: Explicitly enforce strong typing (e.g., Type Hints in Python, TypeScript for JS) to prevent hallucinations.
    - **Project Boundaries**: Define which directories the AI is NOT allowed to modify without human approval.
    - **No Vibecoding**: Explicitly state that agents MUST plan in an artifact before writing any code, and break work down into 5-10 minute atomic subtasks.
+   - **Token & Context Optimization**: Instruct the AI to avoid dumping entire files into context when only small edits are needed. Generate a `.cursorignore` (or `.agentsignore`) to explicitly exclude build artifacts, logs, and large datasets. Require the AI to write concise responses without unnecessary fluff, and to use semantic search or `grep` before reading large files.
 5. **Universal Rule Compatibility**:
    - Automatically generate `CLAUDE.md` and `.cursorrules` files at the project root (by symlinking or copying the rules from `.agents/AGENTS.md` and the community rules fetched in Step 1). This ensures all AI assistants follow the same rules.
 6. **`.agents/workflow.yml` (Multi-Agent Structure)**:
