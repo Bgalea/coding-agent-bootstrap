@@ -52,8 +52,8 @@ Generate the following files to enforce AI standards:
 
 ## Step 4: Codebase Indexing (Memory)
 1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.). Instruct the user to ensure codebase indexing is enabled in their editor settings.
-2. **Advanced RAG / Custom Indexing (Optional)**: ONLY if the project involves building autonomous agents (like Sato-stack) or requires advanced disconnected RAG:
-   - Propose to download and set up custom Python Qdrant indexing scripts (`index_codebase.py`, `update_project_memory.py`).
-   - If accepted, add a `update-memory` rule to the task runner (Makefile/Taskfile) to execute these scripts.
+2. **Advanced RAG / Custom Indexing (Optional)**: ONLY if the project involves building autonomous agents or requires advanced disconnected RAG:
+   - Propose to download and set up custom local vector database indexing scripts.
+   - If accepted, add an `update-memory` command to the project's native task runner (e.g., npm scripts, Taskfile, Makefile) to execute these scripts.
 
 End your task by presenting a summary of the bootstrapped workspace to the user.
