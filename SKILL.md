@@ -56,9 +56,9 @@ Generate the following files to enforce AI standards:
    - Automatically generate `CLAUDE.md` and `.cursorrules` files at the project root (by symlinking or copying the rules from `.agents/AGENTS.md` and the community rules fetched in Step 1). This ensures all AI assistants follow the same rules.
 8. **`.agents/workflow.yml` (Multi-Agent Structure)**:
    - Create a base workflow that defines a multi-agent structure.
-   - The workflow should orchestrate sub-agents representing different roles: *Product Owner*, *Architecte*, *Développeur*, and *Testeur QA*.
+   - The workflow should orchestrate sub-agents representing different roles: *Product Owner*, *Architecte*, *Développeur* (potentially multiple parallel developer agents assigned per feature, layer, or User Story), and *Testeur QA*.
    - Instruct the workflow to pull the execution prompts/instructions for these roles directly from existing skills or the ones downloaded from GitHub.
-   - **QA Gate Rule**: Explicitly define that the *Développeur* agent cannot mark a task as "done". They must hand off to the *Testeur QA* agent, who must review the code and run tests to validate the User Story acceptance criteria before closing it.
+   - **QA Gate Rule**: Explicitly define that the *Développeur* agents cannot mark a task as "done". They must hand off to the *Testeur QA* agent, who must review the code and run tests to validate the User Story acceptance criteria before closing it.
 
 ## Step 4: Codebase Indexing (Memory)
 1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.). Instruct the user to ensure codebase indexing is enabled in their editor settings. Explain the advantages: **zero setup overhead, real-time synchronization with file changes, and optimized resource usage** (saves local CPU/RAM compared to running custom local vector databases).
