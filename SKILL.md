@@ -35,7 +35,9 @@ Generate the following files to enforce AI standards:
 
 1. **`docs/backlog.md`**: Create a tabular Backlog (EPIC / User Stories). Include a strict rule at the top stating that agents MUST update task statuses ("done" or "not done") at the end of every iteration.
 2. **`docs/architecture.md` & `docs/specifications.md`**: Create empty templates.
-3. **`Makefile`**: Include base linter/formatter commands for the stack, and a rule `update-memory` to run local Qdrant indexing scripts.
+3. **`Makefile` (or `package.json` / `Taskfile`)**: 
+   - Create the standard task runner for the stack (e.g. `Makefile` for backend/Python, `package.json` scripts for Node).
+   - Include base linter/formatter commands (e.g. `make lint`).
 4. **`.agents/AGENTS.md`**: 
    - Write the core rules: Business context, mandatory usage of `invoke_subagent` for parallel tasks, and a placeholder `<!-- START_CODE_MAP -->` for automatic code mapping.
    - **Coding Standards**: Explicitly enforce strong typing (e.g., Type Hints in Python, TypeScript for JS) to prevent hallucinations.
@@ -48,8 +50,10 @@ Generate the following files to enforce AI standards:
    - The workflow should orchestrate sub-agents representing different roles: *Product Owner*, *Architecte*, *Développeur*, and *Testeur QA*.
    - Instruct the workflow to pull the execution prompts/instructions for these roles directly from existing skills or the ones downloaded from GitHub.
 
-## Step 4: Vectorial Indexing (Memory)
-1. If applicable, copy standard local indexing scripts (like `index_codebase.py`, `update_project_memory.py`, `search_codebase.py`) into `.agents/scripts/`.
-2. Run the first memory update via `make update-memory`.
+## Step 4: Codebase Indexing (Memory)
+1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.). Instruct the user to ensure codebase indexing is enabled in their editor settings.
+2. **Advanced RAG / Custom Indexing (Optional)**: ONLY if the project involves building autonomous agents (like Sato-stack) or requires advanced disconnected RAG:
+   - Propose to download and set up custom Python Qdrant indexing scripts (`index_codebase.py`, `update_project_memory.py`).
+   - If accepted, add a `update-memory` rule to the task runner (Makefile/Taskfile) to execute these scripts.
 
 End your task by presenting a summary of the bootstrapped workspace to the user.
