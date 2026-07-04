@@ -58,11 +58,13 @@ Generate the following files to enforce AI standards:
    - Create a base workflow that defines a multi-agent structure.
    - The workflow should orchestrate sub-agents representing different roles: *Product Owner*, *Architecte*, *Développeur* (potentially multiple parallel developer agents assigned per feature, layer, or User Story), and *Testeur QA*.
    - Instruct the workflow to pull the execution prompts/instructions for these roles directly from existing skills or the ones downloaded from GitHub.
-   - **Model Routing**: Do not rely on hardcoded model names. Perform a live web search to identify the *current* best models for each specific role:
-     - **Architecte** : Absolute SOTA frontier model (e.g., Claude 3.5 Opus) for deep reasoning and architecture.
-     - **Product Owner** : Frontier model (e.g., Claude 3.5 Sonnet / GPT-4o) for high-quality specifications and logic.
-     - **Développeur** : High-speed, large context, cost-efficient models (e.g., Gemini 1.5 Flash / Gemini 1.5 Pro) since coding requires many iterative generations.
-     - **Testeur QA** : Lightweight/Fast models (e.g., Claude 3.5 Haiku / GPT-4o-mini) for simple, fast code reviews and verification.
+   - **Model Routing**: 
+     1. **Ask the User / Check Local Context**: Before assigning models, the agent MUST explicitly ask the user which models they have access to for different tiers (SOTA, Fast/Coding, Lightweight), OR inspect the workspace (e.g., `.env`) to find configured models. Do NOT hallucinate or assume models (like Claude or GPT) if they are not explicitly confirmed.
+     2. **Assign by Tier**: Once the available models are known, assign them by role:
+        - **Architecte** : Most powerful available model (SOTA) for deep reasoning.
+        - **Product Owner** : Powerful reasoning model for high-quality specs.
+        - **Développeur** : High-speed, large context coding model for iterative generations.
+        - **Testeur QA** : Lightweight/Fast model for simple verification.
    - **Integration & Conflict Resolution**: If multiple developers are working in parallel, they MUST work on separate Git branches. Add an *Integrateur* (or assign the *Architecte*) role responsible for merging these branches, resolving conflicts, and running global integration tests to prevent overlapping code or regressions.
    - **QA Gate Rule**: Explicitly define that the *Développeur* agents cannot mark a task as "done". They must hand off to the *Testeur QA* agent, who must review the code and run tests to validate the User Story acceptance criteria before closing it.
 
