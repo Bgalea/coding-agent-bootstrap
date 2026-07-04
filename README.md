@@ -23,12 +23,20 @@ git clone https://github.com/Bgalea/coding-agent-bootstrap.git ~/.gemini/config/
 Once installed, simply ask your agent:
 > *"Je veux démarrer un nouveau projet Python. Utilise le skill coding-agent-bootstrap."*
 
-### 2. For Claude (Anthropic), Cursor, or Other Agents
-You can inject the core instructions directly into your agent's context. 
-Provide the `SKILL.md` file as a system prompt, custom instruction, or project knowledge. 
+### 2. For Claude (Anthropic)
+To use this as a bootstrap prompt in Claude, the best method is to use **Claude Projects**:
+1. Open Claude and go to **Projects** (left sidebar) -> **Create Project**.
+2. Name your project (e.g., "Bootstrap [MyStack]").
+3. Click on **Set project instructions**.
+4. Copy and paste the entire contents of `SKILL.md` into the instructions box.
+5. Save. You can now prompt Claude inside this project: *"Execute the project bootstrap process for a new [Language/Framework] project."*
 
-For example, simply prompt your AI with:
-> *"Read the instructions in `SKILL.md` and execute the project bootstrap process for a new [Language/Framework] project."*
+### 3. For Cursor Editor
+To use this in Cursor, you can configure it globally or per-project:
+- **Global Rules (Applies everywhere)**: Open Cursor Settings (`Cmd + Shift + P` -> "Cursor Settings"). Go to **Rules > User Rules**. Paste the contents of `SKILL.md` here.
+- **Project Rules (Specific project)**: Create a `.cursorrules` file in the root of an empty directory, or create a `.cursor/rules/bootstrap.mdc` file, and paste the `SKILL.md` content into it.
+
+Once configured, hit `Cmd + I` (Composer) or `Cmd + L` (Chat) and ask Cursor to bootstrap the project.
 
 ## Requirements
 - An autonomous AI assistant (Google Antigravity, Claude, Cursor, etc.).
