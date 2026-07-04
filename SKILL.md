@@ -51,7 +51,7 @@ Generate the following files to enforce AI standards:
    - Instruct the workflow to pull the execution prompts/instructions for these roles directly from existing skills or the ones downloaded from GitHub.
 
 ## Step 4: Codebase Indexing (Memory)
-1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.). Instruct the user to ensure codebase indexing is enabled in their editor settings.
+1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.). Instruct the user to ensure codebase indexing is enabled in their editor settings. Explain the advantages: **zero setup overhead, real-time synchronization with file changes, and optimized resource usage** (saves local CPU/RAM compared to running custom local vector databases).
 2. **Advanced RAG / Custom Indexing (Optional)**: ONLY if the project involves building autonomous agents or requires advanced disconnected RAG:
    - Propose to download and set up custom local vector database indexing scripts.
    - If accepted, add an `update-memory` command to the project's native task runner (e.g., npm scripts, Taskfile, Makefile) to execute these scripts.
