@@ -59,8 +59,11 @@ Generate the following files to enforce AI standards:
    - The workflow should orchestrate sub-agents representing different roles: *Product Owner*, *Architecte*, *Développeur* (potentially multiple parallel developer agents assigned per feature, layer, or User Story), and *Testeur QA*.
    - Instruct the workflow to pull the execution prompts/instructions for these roles directly from existing skills or the ones downloaded from GitHub.
    - **Model Routing**: 
-     - **Ask the User**: Before generating `.agents/workflow.yml`, the agent MUST explicitly pause and ask the user which exact LLM model names to assign for each role (*Architecte*, *Product Owner*, *Développeur*, *Testeur QA*). 
-     - Do NOT invent, assume, or search the web for model names. The agent must strictly use the model names provided by the user (e.g., if the user uses Antigravity, they will provide the exact Gemini model names available to them).
+     - **Platform-Aware Proposal**: Before generating `.agents/workflow.yml`, the agent MUST identify the current AI platform it is running on (e.g., Antigravity, Cursor, Claude Code) and determine the *actual* list of SOTA models currently available on that platform. If it cannot determine this automatically, it MUST ask the user.
+     - **Drafting the Routing Strategy**: The agent will draft a proposal assigning the models by tier:
+       - **Architecte / Product Owner** : Absolute SOTA frontier model available on the platform (e.g., Gemini 3.1 Pro, Claude 4.6 Sonnet).
+       - **Développeur / Testeur QA** : High-speed, large context model available on the platform (e.g., Gemini 3.5 Flash).
+     - **Explicit User Validation**: The agent MUST present this proposed routing to the user and wait for explicit approval before writing the model names into the workflow. Do NOT guess or invent models blindly.
    - **Integration & Conflict Resolution**: If multiple developers are working in parallel, they MUST work on separate Git branches. Add an *Integrateur* (or assign the *Architecte*) role responsible for merging these branches, resolving conflicts, and running global integration tests to prevent overlapping code or regressions.
    - **QA Gate Rule**: Explicitly define that the *Développeur* agents cannot mark a task as "done". They must hand off to the *Testeur QA* agent, who must review the code and run tests to validate the User Story acceptance criteria before closing it.
 
