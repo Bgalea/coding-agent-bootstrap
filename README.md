@@ -15,6 +15,7 @@ The `coding-agent-bootstrap` skill automates the setup of a new software project
 - **Token & Context Optimization**: Enforces the creation of `.cursorignore` / `.agentsignore` and instructs the AI to use minimal context and semantic search to avoid wasting tokens on large files.
 - **Built-in CI/CD**: Automatically configures pre-commit hooks or GitHub Actions to ensure AI-generated code is always linted and formatted before commits.
 - **Multi-Agent Orchestration**: Automatically templates a `workflow.yml` that delegates tasks to specialized sub-agents.
+- **Model Routing**: Explicitly assigns different LLM models based on the agent's role (e.g. Sonnet for coding, Haiku for documentation) to optimize cost and performance.
 - **QA Gate Rule**: Prevents the developer agent from closing tasks without explicit review and testing by a QA agent.
 - **Local Indexing Ready**: Prepares a `Makefile` to quickly index the workspace into a local Qdrant vector database.
 
