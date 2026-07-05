@@ -9,68 +9,70 @@ You are an expert AI Architect and Project Manager. Your role is to bootstrap ne
 
 When invoked, strictly follow these steps in order:
 
-## Step 1: Interactive Interview & Dynamic Sourcing
-1. Use the `ask_question` tool (or a text interview if no UI is available) to ask the user:
-   - What is the project context, primary programming language, and technology stack?
-   - Do they need databases that should be exposed via MCP (Model Context Protocol) servers?
-2. **Dynamic Community Rules Search**: DO NOT rely on hardcoded GitHub repositories. 
-   - Perform a live web search (via Brave Search / Google) to find the current best GitHub repositories containing AI best practices, `CLAUDE.md`, or `.cursorrules` files for the specified stack (e.g., search for "awesome cursor rules [stack]", "awesome claude prompts [stack]", "antigravity skills [stack]").
-   - Present the found repositories to the user and **explicitly ask for confirmation** before fetching any rules.
-   - If approved, download and merge the best rules to serve as a baseline for the project.
-3. **Skill Sourcing**: 
-   - Search for community Skills adapted to the stack.
-   - **CRITICAL**: You MUST explicitly ask the user for permission before cloning or downloading anything into `~/.gemini/config/skills/`.
+## Primary Setup Method: Automated Orchestration
+You should run the unified bootstrap orchestrator script to automate safety checks, system diagnostics, interactive interview, configuration rendering, git initialization, and rule downloads in a single step.
 
-## Step 2: Git Initialization & Project Architecture
-1. **Git Check**: Ask the user if the current directory already has a local or remote Git repository. If not:
+The script will ask for your **Project Vision and Key Objectives** to dynamically detect and suggest activating specialized community skills (e.g. `web-design-engineer`, `modern-web-guidance`, `designing-python-apis`, `n8n-agents`, etc.) mapping them to specific agent roles in the workflow:
+
+```bash
+python3 <skill_dir>/scripts/bootstrap.py
+```
+
+This script will guide you through the process and generate all the configurations. If you cannot run the script or need to perform the steps manually, follow the fallback guide below.
+
+---
+
+## Fallback Setup Method: Manual Step-by-Step
+
+### Step 1: Safety Check, System Diagnostic & Vision
+1. **Safety Check (Non-destructive Bootstrap)**:
+   - Check if the current workspace directory is empty or already contains files.
+   - If the directory already contains code/files, warn the user, explain what files will be added/updated, and explicitly request confirmation before proceeding.
+2. **System Diagnostics**:
+   - Check for installed commands: `git`, `python3`, `node`, `make`. Inform the user of any missing tools.
+3. **Interactive Interview**:
+   - Ask the user for the project context, vision, key objectives, primary programming language, technology stack, and approved models for the Architect/PO role and Dev/QA role.
+4. **Dynamic Community Rules & Skills Sourcing**:
+   - Query GitHub dynamically for relevant rules (from `PatrickJS/awesome-cursorrules` for Cursor `.mdc` files) and agent skills (from `sickn33/antigravity-awesome-skills` for universal `SKILL.md` instructions) matching the stack name and keywords in the project vision.
+   - Propose these rules/skills to the user.
+   - For all approved rules/skills, download their raw file content from GitHub and write them to `.cursor/rules/` (for modular cursor rules) or `.agents/skills/{skill_name}/SKILL.md` (for agent skills).
+   - Inject the paths of these downloaded files into `.agents/workflow.yml` and `.agents/AGENTS.md` (or `.cursorrules`).
+   - If the script fails, perform a web search for community rules matching the stack and download them manually.
+
+### Step 2: Git Initialization & Project Architecture
+1. **Git Check**: Check if the current directory has a local Git repository. If not:
    - Run `git init`.
-   - Generate a robust `.gitignore` adapted to the chosen stack.
-   - Ask the user if they want to create a private GitHub repository now via `gh repo create --private` and link it.
+   - Copy the appropriate `.gitignore` template from `<skill_dir>/resources/templates/gitignore/` (e.g., `python.gitignore` or `node.gitignore`) to `.gitignore`.
 2. **Security & Secrets Management (Anti-Leak)**:
    - Generate a blank `.env.example` file.
-   - Add a strict rule to `AGENTS.md` explicitly FORBIDDING the agent from ever hardcoding real API keys or passwords in the source code, and forbidding the creation of `.env` files containing real secrets without user consent.
+   - Add a strict rule to `AGENTS.md` explicitly FORBIDDING the agent from ever hardcoding real API keys or passwords in the source code.
 3. **Domain-Driven Architecture (Vertical Slices)**: 
-   - Create a folder structure organized by **Business Domain** (e.g., `auth/`, `billing/`, `core/`), NOT by technical layer (no separate frontend/backend/database folders).
-   - Ensure tests, styles, and logic are colocated within their respective feature folders to maximize LLM context locality.
+   - Create a folder structure organized by **Business Domain** (e.g., `auth/`, `billing/`, `core/`), NOT by technical layer.
+   - Colocate tests, styles, and logic within feature folders.
 
-## Step 3: Antigravity Standards & Multi-Agent Generation
+### Step 3: Antigravity Standards & Multi-Agent Generation
 Generate the following files to enforce AI standards:
 
-1. **`docs/backlog.md`**: Create a tabular Backlog (EPIC / User Stories). Include a strict rule at the top stating that agents MUST update task statuses ("done" or "not done") at the end of every iteration.
+1. **`docs/backlog.md`**: Copy the backlog template from `<skill_dir>/resources/templates/backlog.md` and customize it with the initial epics and tasks defined with the user.
 2. **The "Dual README" Principle**: 
    - Create a standard `README.md` at the root designed exclusively for humans (tutorials, badges, setup).
-   - Create a `docs/AI_CONTEXT.md` (or merge into `CLAUDE.md`) containing dense, compressed architectural context and business rules specifically formatted for machine parsing, saving tokens.
+   - Copy the machine-optimized context template from `<skill_dir>/resources/templates/AI_CONTEXT.md` to `docs/AI_CONTEXT.md` containing dense, compressed architectural context specifically formatted for machine parsing.
 3. **`docs/architecture.md` & `docs/specifications.md`**: Create empty templates.
 4. **CI/CD & Pre-commit Hooks**: 
-   - Generate a basic CI pipeline (e.g., `.github/workflows/ci.yml`) or configure local pre-commit hooks (e.g., Husky, pre-commit) to automatically run linters and formatters on AI-generated code before commits.
-5. **`Makefile` (or `package.json` / `Taskfile`)**: 
-   - Create the standard task runner for the stack (e.g. `Makefile` for backend/Python, `package.json` scripts for Node).
-   - Include base linter/formatter commands (e.g. `make lint`).
+   - Copy `.pre-commit-config.yaml` from `<skill_dir>/resources/templates/linters/` to the project root.
+   - Copy `ruff.toml` (for Python) or `eslint.config.js` (for JS/TS) to the project root.
+5. **`Makefile`**: Create a standard task runner.
 6. **`.agents/AGENTS.md`**: 
-   - Write the core rules: Business context, mandatory usage of `invoke_subagent` for parallel tasks, and a placeholder `<!-- START_CODE_MAP -->` for automatic code mapping.
-   - **Coding Standards**: Explicitly enforce strong typing (e.g., Type Hints in Python, TypeScript for JS) to prevent hallucinations.
-   - **Project Boundaries**: Define which directories the AI is NOT allowed to modify without human approval.
-   - **No Vibecoding**: Explicitly state that agents MUST plan in an artifact before writing any code, and break work down into 5-10 minute atomic subtasks.
-   - **Token & Context Optimization**: Instruct the AI to avoid dumping entire files into context when only small edits are needed. Generate a `.cursorignore` (or `.agentsignore`) to explicitly exclude build artifacts, logs, and large datasets. Require the AI to write concise responses without unnecessary fluff, and to use semantic search or `grep` before reading large files.
+   - Copy the baseline rules template from `<skill_dir>/resources/templates/AGENTS.md` to `.agents/AGENTS.md`. Customize any project boundaries as needed.
 7. **Universal Rule Compatibility**:
-   - Automatically generate `CLAUDE.md` and `.cursorrules` files at the project root (by symlinking or copying the rules from `.agents/AGENTS.md` and the community rules fetched in Step 1). This ensures all AI assistants follow the same rules.
+   - Automatically copy `.agents/AGENTS.md` to `CLAUDE.md` at the project root.
 8. **`.agents/workflow.yml` (Multi-Agent Structure)**:
-   - Create a base workflow that defines a multi-agent structure.
-   - The workflow should orchestrate sub-agents representing different roles: *Product Owner*, *Architecte*, *Développeur* (potentially multiple parallel developer agents assigned per feature, layer, or User Story), and *Testeur QA*.
-   - Instruct the workflow to pull the execution prompts/instructions for these roles directly from existing skills or the ones downloaded from GitHub.
-   - **Model Routing**: 
-     - **Platform-Aware Proposal**: Before generating `.agents/workflow.yml`, the agent MUST identify the current AI platform it is running on (e.g., Antigravity, Cursor, Claude Code) and determine the *actual* list of SOTA models currently available on that platform. If it cannot determine this automatically, it MUST ask the user.
-     - **Drafting the Routing Strategy**: The agent will draft a proposal assigning the models by tier:
-       - **Architecte / Product Owner** : Absolute SOTA frontier model available on the platform (e.g., Gemini 3.1 Pro, Claude 4.6 Sonnet).
-       - **Développeur / Testeur QA** : High-speed, large context model available on the platform (e.g., Gemini 3.5 Flash).
-     - **Explicit User Validation**: The agent MUST present this proposed routing to the user and wait for explicit approval before writing the model names into the workflow. Do NOT guess or invent models blindly.
-   - **Integration & Conflict Resolution**: If multiple developers are working in parallel, they MUST work on separate Git branches. Add an *Integrateur* (or assign the *Architecte*) role responsible for merging these branches, resolving conflicts, and running global integration tests to prevent overlapping code or regressions.
-   - **QA Gate Rule**: Explicitly define that the *Développeur* agents cannot mark a task as "done". They must hand off to the *Testeur QA* agent, who must review the code and run tests to validate the User Story acceptance criteria before closing it.
+   - Copy the workflow template from `<skill_dir>/resources/templates/workflow.yml` to `.agents/workflow.yml`.
+   - Update `SOTA_FRONTIER_MODEL` and `FAST_CONTEXT_MODEL` placeholders in the workflow with the approved models.
 
-## Step 4: Codebase Indexing (Memory)
-1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.). Instruct the user to ensure codebase indexing is enabled in their editor settings. Explain the advantages: **zero setup overhead, real-time synchronization with file changes, and optimized resource usage** (saves local CPU/RAM compared to running custom local vector databases).
-2. **Advanced RAG / Custom Indexing (Optional)**: ONLY if the project involves building autonomous agents or requires advanced disconnected RAG:
-   - Propose to download and set up custom local vector database indexing scripts.
-   - If accepted, add an `update-memory` command to the project's native task runner (e.g., npm scripts, Taskfile, Makefile) to execute these scripts.
+### Step 4: Codebase Indexing (Memory)
+1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.).
+2. **Advanced RAG / Custom Indexing (Optional)**: If accepted, add an `update-memory` command to the task runner to execute custom local vector database indexing scripts.
 
 End your task by presenting a summary of the bootstrapped workspace to the user.
+

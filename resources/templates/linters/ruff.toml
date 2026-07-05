@@ -1,0 +1,21 @@
+# Ruff configuration file
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "C90",  # mccabe complexity
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+]
+ignore = []
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

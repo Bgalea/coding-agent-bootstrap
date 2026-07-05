@@ -21,8 +21,14 @@ The `coding-agent-bootstrap` skill automates the setup of a new software project
 
 ## Usage & Installation
 
-### 1. For Google Antigravity
-Clone this repository into your global skills directory:
+### 1. Quick One-Line Installation (Recommended)
+Run the following command in your terminal to automatically install or update the skill:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Bgalea/coding-agent-bootstrap/main/install.sh | bash
+```
+
+### 2. Manual Installation for Google Antigravity
+Alternatively, clone this repository into your global skills directory:
 ```bash
 git clone https://github.com/Bgalea/coding-agent-bootstrap.git ~/.gemini/config/skills/coding-agent-bootstrap
 ```
