@@ -33,7 +33,7 @@ Alternatively, clone this repository into your global skills directory:
 git clone https://github.com/Bgalea/coding-agent-bootstrap.git ~/.gemini/config/skills/coding-agent-bootstrap
 ```
 Once installed, simply ask your agent:
-> *"Je veux démarrer un nouveau projet Python. Utilise le skill coding-agent-bootstrap."*
+> *"I want to start a new Python project. Use the coding-agent-bootstrap skill."*
 
 ### 2. For Claude (Anthropic)
 To use this as a bootstrap prompt in Claude, the best method is to use **Claude Projects**:
