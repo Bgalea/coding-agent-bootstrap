@@ -70,9 +70,16 @@ Generate the following files to enforce AI standards:
    - Copy the workflow template from `<skill_dir>/resources/templates/workflow.yml` to `.agents/workflow.yml`.
    - Update `SOTA_FRONTIER_MODEL` and `FAST_CONTEXT_MODEL` placeholders in the workflow with the approved models.
 
-### Step 4: Codebase Indexing (Memory)
-1. **Native IDE Indexing (Default)**: Rely on the native codebase indexing of the AI assistant (Cursor, Antigravity, etc.).
-2. **Advanced RAG / Custom Indexing (Optional)**: If accepted, add an `update-memory` command to the task runner to execute custom local vector database indexing scripts.
+### Step 4: Autonomous Local Vector Memory (Qdrant + FastEmbed)
+1. **Provision Vector Memory**:
+   - Copy `.agents/scripts/index_codebase.py` and `.agents/scripts/search_codebase.py` from `<skill_dir>/resources/templates/memory/`.
+   - Copy `<skill_dir>/resources/templates/memory/requirements-memory.txt` to `.agents/requirements-memory.txt`.
+   - Provide the project `Makefile` with automation targets:
+     - `make setup-memory`: creates `.agents/.venv`, installs memory dependencies, and pre-fetches the embedding model to `.agents/data/fastembed_cache/` (Sandbox-Safe).
+     - `make index-memory`: indexes codebase chunks into embedded Qdrant (`.agents/data/qdrant_db/`) and updates the code map in `AGENTS.md`.
+     - `make search-memory q="..."`: sub-second semantic search without consuming external API tokens.
+2. **Sandbox-Safe Git Hygiene**:
+   - Ensure `.agents/data/` and `.agents/.venv/` are excluded in `.gitignore` to prevent committing binary ONNX weights or virtualenvs.
 
 End your task by presenting a summary of the bootstrapped workspace to the user.
 

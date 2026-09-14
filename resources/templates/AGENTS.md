@@ -19,6 +19,7 @@
 * **Clean Code**: Keep methods short and focused on a single responsibility. Preserve all comments and docstrings unless explicitly asked to modify them.
 
 ## 4. Token & Context Optimization
+* **Semantic Codebase Search (< 1s, Zero-Token)**: Use `make search-memory q="your concept"` or run `.agents/scripts/search_codebase.py` before opening large files. Pinpoint exact functions and lines locally to avoid flooding context.
 * **Lazy Reading**: Do not read large files fully unless absolutely necessary. Use `grep` or semantic search to pinpoint lines to edit.
 * **Lazy Loading of Skills**: Do not load or read instructions for all global workspace skills at startup. Use `view_file` on a specific skill's `SKILL.md` ONLY when you are preparing to run a task that explicitly requires that skill. This minimizes context pollution and saves tokens.
 * **Concise Communication**: Avoid conversational fluff. Keep responses dense, technical, and action-oriented.

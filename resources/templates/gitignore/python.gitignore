@@ -75,3 +75,7 @@ venv.bak/
 *.njsproj
 *.sln
 *.swp
+
+# Agent local vector memory & environments
+.agents/.venv/
+.agents/data/

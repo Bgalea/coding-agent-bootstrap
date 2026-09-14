@@ -59,6 +59,7 @@ roles:
       - Deconstruct features into high-level Epics and intermediate Features.
       - Define specific NFRs (security, performance, etc.) and Acceptance Criteria for each Feature.
       - Ensure domain-driven vertical slices are followed.
+      - Maintain and refresh codebase vector memory via `make index-memory`.
       - Resolve integration conflicts and review branch merges.
       - **Associated Skills**: ${ARCHITECT_SKILLS}
 
@@ -68,6 +69,7 @@ roles:
     model: "${FAST_CONTEXT_MODEL}"
     instructions: |
       - Implement features using strict typing.
+      - Use `make search-memory q="..."` for fast semantic codebase navigation without context waste.
       - Colocate unit/integration tests.
       - Run local test suite iteratively (MAX 5 local test/fix loops). Validate both functional criteria and NFR constraints.
       - Create dedicated feature branches at `feat/[feature-name]` and push to GitHub to run CI.

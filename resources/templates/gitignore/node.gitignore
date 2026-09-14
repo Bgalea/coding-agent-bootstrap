@@ -89,3 +89,7 @@ out/
 # IDEs
 .vscode/
 .idea/
+
+# Agent local vector memory & environments
+.agents/.venv/
+.agents/data/

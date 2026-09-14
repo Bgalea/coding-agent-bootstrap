@@ -17,7 +17,7 @@ The `coding-agent-bootstrap` skill automates the setup of a new software project
 - **Multi-Agent Orchestration**: Automatically templates a `workflow.yml` that delegates tasks to specialized sub-agents.
 - **Explicit Model Routing**: Instructs the agent to explicitly ask the user which LLM models they have access to for each role (Architect, Developer, PO, QA) before generating the workflow, preventing any hallucination of unavailable models.
 - **QA Gate Rule**: Prevents the developer agent from closing tasks without explicit review and testing by a QA agent.
-- **Local Indexing Ready**: Prepares a `Makefile` to quickly index the workspace into a local Qdrant vector database.
+- **Autonomous Vector Memory (Sandbox-Safe)**: Out-of-the-box local Qdrant vector database + FastEmbed (`all-MiniLM-L6-v2`) confined to `.agents/data/fastembed_cache/` for instant (< 1s), zero-token semantic code search via `make search-memory q="..."` without external API dependencies.
 
 ## Usage & Installation
 

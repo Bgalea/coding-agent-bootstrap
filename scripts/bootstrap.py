@@ -203,6 +203,8 @@ def run_interview():
                 except ValueError:
                     print("Invalid selection. No custom skills activated.")
                     
+    enable_memory = input("\nEnable Sandbox-Safe Local Vector Memory (Qdrant + FastEmbed)? (Y/n): ").strip().lower() != 'n'
+
     return {
         "project_name": project_name,
         "stack": stack,
@@ -210,7 +212,8 @@ def run_interview():
         "sota_model": sota_model,
         "fast_model": fast_model,
         "vision": vision,
-        "activated_skills": activated_skills
+        "activated_skills": activated_skills,
+        "enable_memory": enable_memory
     }
 
 def fetch_community_rules(stack, editor):
@@ -371,7 +374,40 @@ def bootstrap_project(details):
         shutil.copy(os.path.join(linter_templates, ".pre-commit-config.yaml"), ".pre-commit-config.yaml")
         print("  - Generated .pre-commit-config.yaml (Generic)")
         
-    # 8. Git Init
+    # 8. Set up Local Vector Memory (Qdrant + FastEmbed) & Makefile
+    if details.get("enable_memory", True):
+        os.makedirs(os.path.join(".agents", "scripts"), exist_ok=True)
+        os.makedirs(os.path.join(".agents", "data", "fastembed_cache"), exist_ok=True)
+        os.makedirs(os.path.join(".agents", "data", "qdrant_db"), exist_ok=True)
+
+        memory_src = os.path.join(SKILL_DIR, "resources", "templates", "memory")
+        if os.path.exists(memory_src):
+            shutil.copy(os.path.join(memory_src, "index_codebase.py"), os.path.join(".agents", "scripts", "index_codebase.py"))
+            shutil.copy(os.path.join(memory_src, "search_codebase.py"), os.path.join(".agents", "scripts", "search_codebase.py"))
+            shutil.copy(os.path.join(memory_src, "requirements-memory.txt"), os.path.join(".agents", "requirements-memory.txt"))
+            print("  - Generated .agents/scripts/index_codebase.py & search_codebase.py")
+            print("  - Generated .agents/requirements-memory.txt")
+
+        # Copy Makefile if not already present
+        makefile_src = os.path.join(SKILL_DIR, "resources", "templates", "Makefile")
+        if os.path.exists(makefile_src) and not os.path.exists("Makefile"):
+            shutil.copy(makefile_src, "Makefile")
+            print("  - Generated Makefile with memory automation targets")
+
+        # Ensure .gitignore has memory directories
+        if os.path.exists(".gitignore"):
+            with open(".gitignore", "r", encoding="utf-8") as f:
+                gi_content = f.read()
+            missing_ignores = []
+            if ".agents/.venv/" not in gi_content:
+                missing_ignores.append(".agents/.venv/")
+            if ".agents/data/" not in gi_content:
+                missing_ignores.append(".agents/data/")
+            if missing_ignores:
+                with open(".gitignore", "a", encoding="utf-8") as f:
+                    f.write("\n# Agent local vector memory & environments\n" + "\n".join(missing_ignores) + "\n")
+
+    # 9. Git Init
     if not os.path.exists(".git"):
         try:
             subprocess.run(["git", "init"], check=True, stdout=subprocess.DEVNULL)
@@ -392,6 +428,10 @@ def main():
     print(f"Project: {details['project_name']}")
     print(f"Stack: {details['stack']}")
     print(f"IDE Target: {details['editor']}")
+    if details.get("enable_memory"):
+        print("Vector Memory: Enabled (.agents/data/qdrant_db/)")
+        print("  -> Run 'make setup-memory' to install dependencies & pre-fetch model.")
+        print("  -> Run 'make search-memory q=\"query\"' to search code semantically (< 1s).")
     if details["activated_skills"]:
         print("Activated Skills/Rules:")
         for skill in details["activated_skills"]:
