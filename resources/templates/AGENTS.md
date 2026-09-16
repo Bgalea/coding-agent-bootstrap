@@ -20,6 +20,8 @@
 
 ## 4. Token & Context Optimization
 * **Semantic Codebase Search (< 1s, Zero-Token)**: Use `make search-memory q="your concept"` or run `.agents/scripts/search_codebase.py` before opening large files. Pinpoint exact functions and lines locally to avoid flooding context.
+* **Terminal Token Optimization (RTK)**: When available, prefix test runners (`rtk pytest`, `rtk vitest`, `rtk cargo test`, `rtk jest`), linters (`rtk ruff check`, `rtk tsc`, `rtk eslint`), and git inspections (`rtk git status`, `rtk git diff`) with `rtk` to compress bash output by 60-90%.
+* **Native Tool Boundary**: Never use `rtk read`, `rtk grep`, or `rtk find` via bash. Always prioritize Antigravity's native `view_file`, `grep_search`, and `find_by_name` tools.
 * **Lazy Reading**: Do not read large files fully unless absolutely necessary. Use `grep` or semantic search to pinpoint lines to edit.
 * **Lazy Loading of Skills**: Do not load or read instructions for all global workspace skills at startup. Use `view_file` on a specific skill's `SKILL.md` ONLY when you are preparing to run a task that explicitly requires that skill. This minimizes context pollution and saves tokens.
 * **Concise Communication**: Avoid conversational fluff. Keep responses dense, technical, and action-oriented.

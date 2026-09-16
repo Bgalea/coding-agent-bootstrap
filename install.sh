@@ -37,6 +37,12 @@ echo "          INSTALLATION COMPLETED!                 "
 echo "=================================================="
 echo "Skill installed in: $INSTALL_DIR"
 echo ""
+if command -v rtk >/dev/null 2>&1; then
+    echo "✔ RTK (Rust Token Killer) detected: CLI token compression ready."
+else
+    echo "ℹ Tip: Install RTK ('brew install rtk') to cut terminal output tokens by 60-90%."
+fi
+echo ""
 echo "To use this skill in your workspace, ask your agent:"
 echo "\"I want to start a new project. Use the coding-agent-bootstrap skill.\""
 echo "=================================================="

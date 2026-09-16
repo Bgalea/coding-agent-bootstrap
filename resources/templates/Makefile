@@ -5,6 +5,7 @@
 VENV = .agents/.venv
 PYTHON = $(VENV)/bin/python
 PIP = $(VENV)/bin/pip
+RTK := $(shell command -v rtk 2>/dev/null)
 
 help:
 	@echo "=================================================="
@@ -13,8 +14,8 @@ help:
 	@echo "  make setup-memory        Install local vector memory & pre-fetch model"
 	@echo "  make index-memory        Index codebase into local Qdrant vector database"
 	@echo "  make search-memory q=... Instant semantic search (< 1s, sandbox-safe)"
-	@echo "  make lint                Run project linters and style checks"
-	@echo "  make test                Run test suite locally"
+	@echo "  make lint                Run project linters and style checks (RTK-accelerated)"
+	@echo "  make test                Run test suite locally (RTK-accelerated)"
 	@echo "=================================================="
 
 setup-memory:
@@ -47,18 +48,20 @@ search-memory:
 
 lint:
 	@if command -v ruff >/dev/null 2>&1; then \
-		ruff check . && ruff format --check .; \
+		if [ -n "$(RTK)" ]; then rtk ruff check . && ruff format --check .; else ruff check . && ruff format --check .; fi; \
 	elif command -v npx >/dev/null 2>&1; then \
-		npx eslint .; \
+		if [ -n "$(RTK)" ]; then rtk npx eslint .; else npx eslint .; fi; \
 	else \
 		echo "No linter detected (ruff or eslint)."; \
 	fi
 
 test:
 	@if command -v pytest >/dev/null 2>&1; then \
-		pytest; \
+		if [ -n "$(RTK)" ]; then rtk pytest; else pytest; fi; \
 	elif command -v npm >/dev/null 2>&1; then \
-		npm test; \
+		if [ -n "$(RTK)" ]; then rtk test; else npm test; fi; \
+	elif command -v cargo >/dev/null 2>&1; then \
+		if [ -n "$(RTK)" ]; then rtk cargo test; else cargo test; fi; \
 	else \
-		echo "No test runner detected (pytest or npm test)."; \
+		echo "No test runner detected (pytest, npm test, or cargo test)."; \
 	fi

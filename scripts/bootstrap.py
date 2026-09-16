@@ -27,7 +27,8 @@ def run_diagnostics():
         "python3": {"req": True, "desc": "Python runtime (Required for agent scripts)"},
         "node": {"req": False, "desc": "Node.js runtime (Optional, for JS/TS stack)"},
         "make": {"req": False, "desc": "Make build runner (Optional, for tasks)"},
-        "docker": {"req": False, "desc": "Docker runtime (Optional, for containers)"}
+        "docker": {"req": False, "desc": "Docker runtime (Optional, for containers)"},
+        "rtk": {"req": False, "desc": "Rust Token Killer CLI proxy (Optional, cuts CLI tokens by 60-90%)"}
     }
     
     missing_required = []
@@ -46,6 +47,8 @@ def run_diagnostics():
         sys.exit(1)
     else:
         print("System diagnostics check passed successfully.")
+        if not check_command("rtk"):
+            print("  Tip: Install 'rtk' via 'brew install rtk' to reduce terminal output tokens by 60-90%.")
     print("")
 
 def check_safety():
@@ -205,6 +208,11 @@ def run_interview():
                     
     enable_memory = input("\nEnable Sandbox-Safe Local Vector Memory (Qdrant + FastEmbed)? (Y/n): ").strip().lower() != 'n'
 
+    has_rtk = check_command("rtk")
+    enable_rtk = False
+    if has_rtk:
+        enable_rtk = input("Enable RTK CLI Token Compression (60-90% token reduction for tests/lint/git)? (Y/n): ").strip().lower() != 'n'
+
     return {
         "project_name": project_name,
         "stack": stack,
@@ -213,7 +221,8 @@ def run_interview():
         "fast_model": fast_model,
         "vision": vision,
         "activated_skills": activated_skills,
-        "enable_memory": enable_memory
+        "enable_memory": enable_memory,
+        "enable_rtk": enable_rtk
     }
 
 def fetch_community_rules(stack, editor):
@@ -341,6 +350,9 @@ def bootstrap_project(details):
         render_template("AGENTS.md", ".agents/AGENTS.md")
         render_template("workflow.yml", ".agents/workflow.yml")
         render_template("AGENTS.md", "CLAUDE.md")
+        if details.get("enable_rtk"):
+            os.makedirs(".agents/rules", exist_ok=True)
+            render_template("antigravity-rtk-rules.md", ".agents/rules/antigravity-rtk-rules.md")
     elif editor == "cursor":
         render_template("AGENTS.md", ".cursorrules")
     elif editor == "claude-code":
@@ -352,6 +364,9 @@ def bootstrap_project(details):
         render_template("AGENTS.md", ".agents/AGENTS.md")
         render_template("workflow.yml", ".agents/workflow.yml")
         render_template("AGENTS.md", "CLAUDE.md")
+        if details.get("enable_rtk"):
+            os.makedirs(".agents/rules", exist_ok=True)
+            render_template("antigravity-rtk-rules.md", ".agents/rules/antigravity-rtk-rules.md")
         
     # 6. Create empty architecture and specifications files
     with open("docs/architecture.md", "w", encoding="utf-8") as f:
@@ -432,6 +447,10 @@ def main():
         print("Vector Memory: Enabled (.agents/data/qdrant_db/)")
         print("  -> Run 'make setup-memory' to install dependencies & pre-fetch model.")
         print("  -> Run 'make search-memory q=\"query\"' to search code semantically (< 1s).")
+    if details.get("enable_rtk"):
+        print("RTK Token Compression: Enabled (60-90% CLI output reduction for tests/lint/git)")
+        print("  -> Rules generated in .agents/rules/antigravity-rtk-rules.md")
+        print("  -> Makefile 'lint' and 'test' automatically accelerated with RTK")
     if details["activated_skills"]:
         print("Activated Skills/Rules:")
         for skill in details["activated_skills"]:

@@ -13,6 +13,7 @@ The `coding-agent-bootstrap` skill automates the setup of a new software project
 - **Universal AI Standards**: Generates `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `task.md`, and an agile `backlog.md`.
 - **Dual README Principle**: Generates a standard `README.md` for humans and a compressed `AI_CONTEXT.md` for machines, saving tokens.
 - **Token & Context Optimization**: Enforces the creation of `.cursorignore` / `.agentsignore` and instructs the AI to use minimal context and semantic search to avoid wasting tokens on large files.
+- **RTK Terminal Compression**: Integrates with [RTK (Rust Token Killer)](https://github.com/rtk-ai/rtk) to reduce terminal output tokens by 60–90% on test suites (`pytest`, `vitest`, `cargo test`), linters (`ruff`, `eslint`, `tsc`), and git commands, while strictly preserving Antigravity's native tools (`view_file`, `grep_search`).
 - **Built-in CI/CD**: Automatically configures pre-commit hooks or GitHub Actions to ensure AI-generated code is always linted and formatted before commits.
 - **Multi-Agent Orchestration**: Automatically templates a `workflow.yml` that delegates tasks to specialized sub-agents.
 - **Explicit Model Routing**: Instructs the agent to explicitly ask the user which LLM models they have access to for each role (Architect, Developer, PO, QA) before generating the workflow, preventing any hallucination of unavailable models.
@@ -53,3 +54,4 @@ Once configured, hit `Cmd + I` (Composer) or `Cmd + L` (Chat) and ask Cursor to 
 ## Requirements
 - An autonomous AI assistant (Google Antigravity, Claude, Cursor, etc.).
 - `gh` CLI (optional, if you want the agent to automatically create private GitHub repos).
+- `rtk` CLI (optional, recommended: `brew install rtk` to cut terminal output tokens by 60–90%).

@@ -29,7 +29,7 @@ This script will guide you through the process and generate all the configuratio
    - Check if the current workspace directory is empty or already contains files.
    - If the directory already contains code/files, warn the user, explain what files will be added/updated, and explicitly request confirmation before proceeding.
 2. **System Diagnostics**:
-   - Check for installed commands: `git`, `python3`, `node`, `make`. Inform the user of any missing tools.
+   - Check for installed commands: `git`, `python3`, `node`, `make`, `rtk`. Inform the user of any missing tools. Recommend installing `rtk` (`brew install rtk`) to cut terminal output tokens by 60-90%.
 3. **Interactive Interview**:
    - Ask the user for the project context, vision, key objectives, primary programming language, technology stack, and approved models for the Architect/PO role and Dev/QA role.
 4. **Dynamic Community Rules & Skills Sourcing**:
@@ -61,9 +61,10 @@ Generate the following files to enforce AI standards:
 4. **CI/CD & Pre-commit Hooks**: 
    - Copy `.pre-commit-config.yaml` from `<skill_dir>/resources/templates/linters/` to the project root.
    - Copy `ruff.toml` (for Python) or `eslint.config.js` (for JS/TS) to the project root.
-5. **`Makefile`**: Create a standard task runner.
-6. **`.agents/AGENTS.md`**: 
+5. **`Makefile`**: Create a standard task runner with automated RTK acceleration for `test` and `lint` targets.
+6. **`.agents/AGENTS.md` & Rules**: 
    - Copy the baseline rules template from `<skill_dir>/resources/templates/AGENTS.md` to `.agents/AGENTS.md`. Customize any project boundaries as needed.
+   - If RTK is enabled, generate `.agents/rules/antigravity-rtk-rules.md` to enforce terminal token compression while preserving Antigravity native tools (`view_file`, `grep_search`).
 7. **Universal Rule Compatibility**:
    - Automatically copy `.agents/AGENTS.md` to `CLAUDE.md` at the project root.
 8. **`.agents/workflow.yml` (Multi-Agent Structure)**:
