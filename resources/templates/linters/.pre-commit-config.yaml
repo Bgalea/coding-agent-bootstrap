@@ -15,3 +15,12 @@ repos:
       - id: ruff
         args: [ --fix ]
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: architecture-invariants
+        name: Architectural Invariants & AI Guardrails
+        entry: bash -c "if [ -f src/lib/architecture.test.ts ]; then npx vitest run src/lib/architecture.test.ts; elif [ -f tests/test_architecture.py ]; then pytest tests/test_architecture.py; fi"
+        language: system
+        pass_filenames: false
+        always_run: true

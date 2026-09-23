@@ -40,6 +40,21 @@ def run_diagnostics():
         if not exists and info["req"]:
             missing_required.append(cmd)
             
+    # Check Linear MCP configuration for modern dynamic product management
+    mcp_config_path = os.path.expanduser("~/.gemini/config/mcp_config.json")
+    has_linear_mcp = False
+    if os.path.exists(mcp_config_path):
+        try:
+            with open(mcp_config_path, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+                if "linear" in cfg.get("mcpServers", {}):
+                    has_linear_mcp = True
+        except Exception:
+            pass
+
+    linear_status = "✔ Configured" if has_linear_mcp else "⚠ Missing (Optional)"
+    print(f"  {'linear-mcp':<10} : {linear_status:<22} | Modern dynamic issue pilot (Zero-Leak)")
+
     print("==================================================")
     if missing_required:
         print(f"CRITICAL: Missing required system tools: {', '.join(missing_required)}")
@@ -49,6 +64,8 @@ def run_diagnostics():
         print("System diagnostics check passed successfully.")
         if not check_command("rtk"):
             print("  Tip: Install 'rtk' via 'brew install rtk' to reduce terminal output tokens by 60-90%.")
+        if not has_linear_mcp:
+            print("  Tip: Configure Linear MCP in ~/.gemini/config/mcp_config.json to pilot projects dynamically.")
     print("")
 
 def check_safety():
@@ -213,6 +230,16 @@ def run_interview():
     if has_rtk:
         enable_rtk = input("Enable RTK CLI Token Compression (60-90% token reduction for tests/lint/git)? (Y/n): ").strip().lower() != 'n'
 
+    use_linear = input("\nUse Linear as Modern Dynamic Pilot via MCP (Prevents static backlog drift & split-brain)? (Y/n): ").strip().lower() != 'n'
+    linear_team = ""
+    if use_linear:
+        linear_team = input("Linear Team Identifier / Prefix (e.g. CORE, PROJ, APP) [Optional]: ").strip().upper()
+
+    enable_guardrails = input("\nEnable Automated Architecture Guardrails ('Inviolable Barriers' test suite)? (Y/n): ").strip().lower() != 'n'
+    enable_precommit_hook = False
+    if enable_guardrails:
+        enable_precommit_hook = input("Install Git Pre-Commit Hook to physically block non-compliant commits? (Y/n): ").strip().lower() != 'n'
+
     return {
         "project_name": project_name,
         "stack": stack,
@@ -222,7 +249,11 @@ def run_interview():
         "vision": vision,
         "activated_skills": activated_skills,
         "enable_memory": enable_memory,
-        "enable_rtk": enable_rtk
+        "enable_rtk": enable_rtk,
+        "use_linear": use_linear,
+        "linear_team": linear_team,
+        "enable_guardrails": enable_guardrails,
+        "enable_precommit_hook": enable_precommit_hook
     }
 
 def fetch_community_rules(stack, editor):
@@ -389,7 +420,23 @@ def bootstrap_project(details):
         shutil.copy(os.path.join(linter_templates, ".pre-commit-config.yaml"), ".pre-commit-config.yaml")
         print("  - Generated .pre-commit-config.yaml (Generic)")
         
-    # 8. Set up Local Vector Memory (Qdrant + FastEmbed) & Makefile
+    # 8. Architecture Invariant Guardrails
+    if details.get("enable_guardrails", True):
+        arch_template_dir = os.path.join(SKILL_DIR, "resources", "templates", "architecture")
+        if details["stack"] in ["node", "typescript", "javascript"]:
+            dest_dir = os.path.join("src", "lib")
+            os.makedirs(dest_dir, exist_ok=True)
+            dest_file = os.path.join(dest_dir, "architecture.test.ts")
+            shutil.copy(os.path.join(arch_template_dir, "architecture.test.ts"), dest_file)
+            print(f"  - Generated {dest_file} (Automated Guardrail Suite)")
+        elif details["stack"] in ["python"]:
+            dest_dir = "tests"
+            os.makedirs(dest_dir, exist_ok=True)
+            dest_file = os.path.join(dest_dir, "test_architecture.py")
+            shutil.copy(os.path.join(arch_template_dir, "test_architecture.py"), dest_file)
+            print(f"  - Generated {dest_file} (Automated Guardrail Suite)")
+
+    # 9. Set up Local Vector Memory (Qdrant + FastEmbed) & Makefile
     if details.get("enable_memory", True):
         os.makedirs(os.path.join(".agents", "scripts"), exist_ok=True)
         os.makedirs(os.path.join(".agents", "data", "fastembed_cache"), exist_ok=True)
@@ -407,7 +454,7 @@ def bootstrap_project(details):
         makefile_src = os.path.join(SKILL_DIR, "resources", "templates", "Makefile")
         if os.path.exists(makefile_src) and not os.path.exists("Makefile"):
             shutil.copy(makefile_src, "Makefile")
-            print("  - Generated Makefile with memory automation targets")
+            print("  - Generated Makefile with memory & guardrails automation targets")
 
         # Ensure .gitignore has memory directories
         if os.path.exists(".gitignore"):
@@ -422,13 +469,27 @@ def bootstrap_project(details):
                 with open(".gitignore", "a", encoding="utf-8") as f:
                     f.write("\n# Agent local vector memory & environments\n" + "\n".join(missing_ignores) + "\n")
 
-    # 9. Git Init
+    # 10. Git Init & Pre-Commit Hook
     if not os.path.exists(".git"):
         try:
             subprocess.run(["git", "init"], check=True, stdout=subprocess.DEVNULL)
             print("  - Initialized Git repository")
         except Exception as e:
             print(f"Warning: Failed to initialize Git repository: {e}")
+
+    # Install Git Pre-Commit Hook to physically prevent non-compliant commits
+    if details.get("enable_precommit_hook", True) and os.path.exists(".git"):
+        hooks_dir = os.path.join(".git", "hooks")
+        os.makedirs(hooks_dir, exist_ok=True)
+        hook_src = os.path.join(SKILL_DIR, "resources", "templates", "hooks", "pre-commit")
+        hook_dest = os.path.join(hooks_dir, "pre-commit")
+        if os.path.exists(hook_src):
+            shutil.copy(hook_src, hook_dest)
+            try:
+                os.chmod(hook_dest, 0o755)
+            except Exception:
+                pass
+            print("  - Installed & activated .git/hooks/pre-commit (Physical Invariant Barrier)")
 
 def main():
     run_diagnostics()
@@ -443,6 +504,15 @@ def main():
     print(f"Project: {details['project_name']}")
     print(f"Stack: {details['stack']}")
     print(f"IDE Target: {details['editor']}")
+    if details.get("use_linear"):
+        team_str = f" (Team: {details['linear_team']})" if details.get("linear_team") else ""
+        print(f"Product Pilot: Linear MCP Enabled{team_str} (Pilot vs. Factory architecture)")
+    else:
+        print("Product Pilot: Local Backlog Fallback (docs/backlog.md)")
+    if details.get("enable_guardrails"):
+        print("Architecture Guardrails: Enabled (Automated Invariant Tests)")
+    if details.get("enable_precommit_hook"):
+        print("Physical Gate: Git Pre-Commit Hook Active (.git/hooks/pre-commit)")
     if details.get("enable_memory"):
         print("Vector Memory: Enabled (.agents/data/qdrant_db/)")
         print("  -> Run 'make setup-memory' to install dependencies & pre-fetch model.")

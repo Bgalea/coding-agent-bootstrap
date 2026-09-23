@@ -5,39 +5,39 @@ agile_steps:
   1_vision:
     name: "Vision Definition"
     owner: "product_owner"
-    description: "Define the high-level project vision and core user value."
+    description: "Define the high-level project vision and core user value in Linear or backlog.md."
   2_objectives:
     name: "Objectives Sourcing"
     owner: "product_owner"
-    description: "Establish measurable key objectives and milestones."
+    description: "Establish measurable key objectives, cycles, and milestones."
   3_epic_and_features:
     name: "Epic & Feature Sourcing"
     owner: "architect"
-    description: "Deconstruct vision into high-level Epics and intermediate deliverables (Features), including NFR elements and Feature Acceptance Criteria."
+    description: "Deconstruct vision into Epics, ADR tickets, and intermediate Features with NFR requirements and Acceptance Criteria."
   4_user_story:
     name: "User Story Backlog"
     owner: "product_owner"
-    description: "Write atomic User Stories associated to parente Features, detailing their functional acceptance criteria."
+    description: "Write atomic User Stories with Personas and Acceptance Criteria in Linear (or backlog.md)."
   5_dev:
     name: "Feature Development"
     owner: "developer"
-    description: "Implement code logic and colocate unit/integration tests targeting the current Feature."
+    description: "Implement code logic and colocate unit/integration tests targeting the current Feature / Linear ticket."
   6_local_test:
-    name: "Iterative Local Testing"
+    name: "Iterative Local Testing & Guardrails"
     owner: "developer"
-    description: "Run test suite locally. Verify functional criteria and NFR constraints (Limit: Max 5 local loops)."
+    description: "Run local test suite including architecture invariant tests (architecture.test.*). Verify functional criteria and NFR constraints (Limit: Max 5 local loops)."
   7_upload:
-    name: "Feature Branch Upload"
+    name: "Feature Branch Upload & Pre-Commit Hook"
     owner: "developer"
-    description: "Commit code and push to a dedicated Feature branch `feat/[feature-name]` to trigger the CI (GitHub Actions) pipeline."
+    description: "Commit code through the Git pre-commit hook (physically verifying architecture tests) and push to dedicated Feature branch `feat/[feature-name]` to trigger CI."
   8_ci_verification:
     name: "GitHub Actions CI Verification"
     owner: "qa_tester"
-    description: "Analyze GitHub Actions CI test results. Validate Feature-level NFRs and acceptance criteria. If CI fails, return to step 5 (Limit: Max 5 CI correction loops)."
+    description: "Analyze GitHub Actions CI test results. Validate Feature-level NFRs, architecture guardrails, and acceptance criteria. If CI fails, return to step 5 (Limit: Max 5 CI correction loops)."
   9_success:
     name: "Definition of Done (Success)"
     owner: "product_owner"
-    description: "Verify all Stories and parent Feature acceptance criteria/NFRs, then merge the Feature branch to the main branch."
+    description: "Verify all Stories and parent Feature acceptance criteria/NFRs, update Linear ticket status to Done, then merge the Feature branch to the main branch."
 
 roles:
   product_owner:
@@ -45,19 +45,21 @@ roles:
     description: "Manages backlog priority, defines Vision, Objectives, and User Stories (Steps 1, 2, 4, 9)."
     model: "${SOTA_FRONTIER_MODEL}"
     instructions: |
-      - Define project vision and key objectives in docs/backlog.md
-      - Write user stories and functional acceptance criteria.
+      - Define project vision and key objectives in Linear or docs/backlog.md
+      - Write user stories with explicit personas and functional acceptance criteria.
       - Perform final review (Definition of Done) to sign off Stories and Features.
+      - Update Linear issue statuses and comments upon completion.
       - **Associated Skills**: ${PO_SKILLS}
 
   architect:
     role: "Architect"
-    description: "Specifies folder structure, designs specifications, maps Epics, Features, NFR requirements, and Feature Acceptance Criteria (Steps 3, 9)."
+    description: "Specifies folder structure, designs specifications, maps Epics, Features, ADR tickets, NFR requirements, and architecture invariant tests (Steps 3, 9)."
     model: "${SOTA_FRONTIER_MODEL}"
     instructions: |
-      - Design technical specifications in docs/specifications.md
+      - Design technical specifications in docs/specifications.md and record ADRs as traceable tickets.
       - Deconstruct features into high-level Epics and intermediate Features.
-      - Define specific NFRs (security, performance, etc.) and Acceptance Criteria for each Feature.
+      - Define and maintain automated architecture guardrail tests (`architecture.test.*`).
+      - Define specific NFRs (security, latency, viewport bounds) and Acceptance Criteria for each Feature.
       - Ensure domain-driven vertical slices are followed.
       - Maintain and refresh codebase vector memory via `make index-memory`.
       - Resolve integration conflicts and review branch merges.
@@ -65,14 +67,15 @@ roles:
 
   developer:
     role: "Developer"
-    description: "Implements logic, tests locally, commits at Feature level, and pushes branch (Steps 5, 6, 7)."
+    description: "Implements logic, runs local tests & guardrails, commits through pre-commit hook, and pushes branch (Steps 5, 6, 7)."
     model: "${FAST_CONTEXT_MODEL}"
     instructions: |
-      - Implement features using strict typing.
+      - When assigned a Linear ticket ("Take ticket PROJ-X"), fetch criteria via Linear MCP without context bloating.
+      - Implement features using strict typing and approved base design components.
+      - Adhere strictly to project architectural invariants (design tokens, encapsulation wrappers, anti-cliché tone).
       - Use `make search-memory q="..."` for fast semantic codebase navigation without context waste.
-      - Colocate unit/integration tests.
-      - Run local test suite iteratively (MAX 5 local test/fix loops). Validate both functional criteria and NFR constraints.
-      - Create dedicated feature branches at `feat/[feature-name]` and push to GitHub to run CI.
+      - Colocate unit/integration tests and run `make test` (including architecture tests).
+      - Ensure Git pre-commit hook passes cleanly before pushing to `feat/[feature-name]`.
       - **Associated Skills**: ${DEV_SKILLS}
 
   qa_tester:
@@ -81,14 +84,15 @@ roles:
     model: "${FAST_CONTEXT_MODEL}"
     instructions: |
       - Monitor GitHub Actions CI test runs.
-      - Audit NFR compliance (e.g. response time, secrets leak checks, coverage).
-      - If CI fails, identify bugs and guide the developer to return to Step 5 (MAX 5 CI fix loops).
-      - Sign off on User Stories and parent Features in docs/backlog.md only after successful CI verification of all functional and NFR acceptance criteria.
+      - Audit NFR compliance (e.g. response time, secrets leak checks, coverage, architecture test results).
+      - If CI fails, identify bugs with Root Cause Analysis (RCA) and guide the developer to return to Step 5 (MAX 5 CI fix loops).
+      - Sign off on User Stories and parent Features only after successful CI verification of all functional, architectural, and NFR acceptance criteria.
       - **Associated Skills**: ${QA_SKILLS}
 
 rules:
   qa_gate: true
   enforce_branching: true
+  enforce_architecture_guardrails: true
   main_branch: "main"
   conflict_resolver: "architect"
   max_local_loops: 5

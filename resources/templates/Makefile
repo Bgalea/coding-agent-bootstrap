@@ -1,6 +1,6 @@
-# Automation Makefile with Local Vector Memory & Quality Gates
+# Automation Makefile with Local Vector Memory, Architecture Guardrails & Quality Gates
 
-.PHONY: help setup-memory index-memory search-memory lint test
+.PHONY: help setup-memory index-memory search-memory lint test test-arch
 
 VENV = .agents/.venv
 PYTHON = $(VENV)/bin/python
@@ -15,7 +15,8 @@ help:
 	@echo "  make index-memory        Index codebase into local Qdrant vector database"
 	@echo "  make search-memory q=... Instant semantic search (< 1s, sandbox-safe)"
 	@echo "  make lint                Run project linters and style checks (RTK-accelerated)"
-	@echo "  make test                Run test suite locally (RTK-accelerated)"
+	@echo "  make test-arch           Run automated architectural invariant tests"
+	@echo "  make test                Run full test suite + architecture guardrails (RTK)"
 	@echo "=================================================="
 
 setup-memory:
@@ -55,7 +56,17 @@ lint:
 		echo "No linter detected (ruff or eslint)."; \
 	fi
 
-test:
+test-arch:
+	@echo "Running architectural invariants and AI guardrail checks..."
+	@if [ -f "src/lib/architecture.test.ts" ]; then \
+		if [ -n "$(RTK)" ]; then rtk npx vitest run src/lib/architecture.test.ts; else npx vitest run src/lib/architecture.test.ts; fi; \
+	elif [ -f "tests/test_architecture.py" ]; then \
+		if [ -n "$(RTK)" ]; then rtk pytest tests/test_architecture.py; else pytest tests/test_architecture.py; fi; \
+	else \
+		echo "No architecture test suite file found."; \
+	fi
+
+test: test-arch
 	@if command -v pytest >/dev/null 2>&1; then \
 		if [ -n "$(RTK)" ]; then rtk pytest; else pytest; fi; \
 	elif command -v npm >/dev/null 2>&1; then \

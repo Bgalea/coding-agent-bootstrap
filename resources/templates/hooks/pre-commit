@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Git Pre-Commit Hook: Automated Architectural Guardrails
+# ==============================================================================
+# "An AI agent can ignore prose in a markdown file, but it cannot ignore a failing
+# unit test or a rejected git commit."
+#
+# This hook runs prior to 'git commit'. If any architectural invariant, design
+# constraint, secret leak, or AI cliché is detected, the commit is rejected (exit 1).
+# ==============================================================================
+
+set -e
+
+echo "🔒 [Guardrail] Running pre-commit architectural invariants check..."
+
+# 1. TypeScript / JavaScript Projects (Vitest / Jest)
+if [ -f "src/lib/architecture.test.ts" ]; then
+    echo "  -> Executing Vitest architecture test suite..."
+    if command -v npx >/dev/null 2>&1; then
+        npx vitest run src/lib/architecture.test.ts --silent
+    else
+        echo "⚠️ Warning: 'npx' not found, falling back to npm test..."
+        npm test -- src/lib/architecture.test.ts
+    fi
+elif [ -f "tests/architecture.test.ts" ]; then
+    echo "  -> Executing Vitest architecture test suite..."
+    npx vitest run tests/architecture.test.ts --silent
+fi
+
+# 2. Python Projects (Pytest)
+if [ -f "tests/test_architecture.py" ]; then
+    echo "  -> Executing Pytest architecture test suite..."
+    if [ -f ".venv/bin/pytest" ]; then
+        .venv/bin/pytest tests/test_architecture.py -q
+    elif command -v pytest >/dev/null 2>&1; then
+        pytest tests/test_architecture.py -q
+    else
+        echo "⚠️ Warning: 'pytest' not found in PATH or .venv."
+    fi
+fi
+
+# 3. Fast Zero-Leak Secret Scanner fallback on staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -n "$STAGED_FILES" ]; then
+    for FILE in $STAGED_FILES; do
+        if [ -f "$FILE" ]; then
+            # Check for API keys or private tokens
+            if grep -Eq 'sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{30,}|AIzaSy[a-zA-Z0-9_-]{33}|BEGIN (RSA|EC|PRIVATE) KEY' "$FILE"; then
+                echo "❌ CRITICAL SECURITY ERROR: Potential secret or private key staged in: $FILE"
+                echo "   Commit aborted! Remove credentials and use environment variables."
+                exit 1
+            fi
+        fi
+    done
+fi
+
+echo "✅ [Guardrail] All architectural invariants verified. Proceeding with commit."
+exit 0
